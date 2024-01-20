@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ///
 /// Workaround for missing ranges functionality
+/// (granular include version)
 /// (uses ranges-v3 as a fallback and assumes it to be in the include path)
 ///
 /// (c) Copyright Domagoj Saric.
@@ -14,18 +15,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <algorithm>
+#include <version>
 
-#if __cpp_lib_ranges < 201911L
+#if __cpp_lib_ranges >= 201911L
+#   include <algorithm>
+#else
 #   include <range/v3/algorithm/equal.hpp>
 #   include <range/v3/algorithm/equal_range.hpp>
-#   include <range/v3/algorithm/find.hpp>
-#   include <range/v3/algorithm/find_if.hpp>
-#   include <range/v3/algorithm/fold.hpp>
-    namespace std { namespace ranges { using namespace ::ranges; } }
-#endif
-
-#if __cpp_lib_ranges_fold < 202207L
-#   include <range/v3/algorithm/max.hpp>
     namespace std { namespace ranges { using namespace ::ranges; } }
 #endif

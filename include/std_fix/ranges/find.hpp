@@ -17,11 +17,10 @@
 
 #include <version>
 
-#if __cpp_lib_ranges_fold >= 202207L
+#if __cpp_lib_ranges >= 201911L
 #   include <algorithm>
 #else
 #	include <range/v3/algorithm/find.hpp>
 #   include <range/v3/algorithm/find_if.hpp>
-#	include <range/v3/algorithm/fold.hpp>
 	namespace std { namespace ranges { using namespace ::ranges; } }
 #endif
