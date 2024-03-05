@@ -21,6 +21,7 @@
 #   include <algorithm>
 #else
 #	include <range/v3/algorithm/find.hpp>
+#	include <range/v3/algorithm/find_first_of.hpp>
 #   include <range/v3/algorithm/find_if.hpp>
-	namespace std { namespace ranges { using namespace ::ranges; } }
+	namespace std { using namespace ::ranges::cpp20; }
 #endif
