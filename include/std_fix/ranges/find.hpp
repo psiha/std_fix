@@ -23,5 +23,6 @@
 #	include <range/v3/algorithm/find.hpp>
 #	include <range/v3/algorithm/find_first_of.hpp>
 #   include <range/v3/algorithm/find_if.hpp>
+#   include <range/v3/algorithm/find_if_not.hpp>
 	namespace std { using namespace ::ranges::cpp20; }
 #endif
