@@ -13,5 +13,5 @@ Expecting/supporting:
  - Apple: Xcode 14
  - Android: NDK 25b
  - Emscripten: emsdk 3.1.17
- - Linux: LLVM15
- - Windows: LLVM15 w/ Clang-CL
+ - Linux: Clang 18.1
+ - Windows: VS2022 w/ Clang-CL 17.0.3
