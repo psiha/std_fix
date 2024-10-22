@@ -39,6 +39,9 @@ namespace std
         {
             return static_cast<Iter const &>( *this ) <=> static_cast<Iter const &>( other );
         }
+
+        constexpr Iter const & base() const &  noexcept { return *this; }
+        constexpr Iter         base()       && noexcept { return std::move( static_cast<Iter &>( *this ) ); }
     }; // basic_const_iterator
 } // namespace std
 #endif
