@@ -34,7 +34,11 @@ namespace std
         basic_const_iterator   operator+ ( difference_type const x ) const noexcept { auto res{ *this }; res += x; return res; }
         basic_const_iterator   operator- ( difference_type const x ) const noexcept { auto res{ *this }; res -= x; return res; }
 
-        difference_type operator-( basic_const_iterator const & other ) const noexcept { return static_cast<Iter const &>( *this ) - static_cast<Iter const &>( other ); }
+        difference_type operator-( basic_const_iterator const & other ) const noexcept
+        requires requires{ this->base() - other.base(); }
+        {
+            return this->base() - other.base();
+        }
 
         friend auto operator+( difference_type const diff, basic_const_iterator const & it ) noexcept { return it + diff; }
 
