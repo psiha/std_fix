@@ -3,10 +3,13 @@
 #include <iterator>
 
 #if __cpp_lib_ranges_as_const < 202207L
+#include <cstdint>
+#include <concepts>
 namespace std
 {
+//{
     template <input_iterator Iter>
-    class basic_const_iterator : private Iter
+    class [[ clang::trivial_abi ]] basic_const_iterator
     {
     public:
         using iterator_concept  = Iter::iterator_concept;
@@ -16,25 +19,25 @@ namespace std
         using reference         = value_type &;
         using pointer           = value_type *;
 
-        using Iter::Iter;
-        basic_const_iterator( Iter const base ) noexcept : Iter( base ) {}
+        constexpr basic_const_iterator() noexcept = default;
+        constexpr basic_const_iterator( Iter const base ) noexcept : base_( base ) {}
 
-        reference operator* () const noexcept { return Iter::operator* (); }
-        pointer   operator->() const noexcept { return Iter::operator->(); }
-        reference operator[]( std::size_t const i ) const noexcept { return Iter::operator[]( i ); }
+        constexpr reference operator* () const noexcept { return *base_; }
+        constexpr pointer   operator->() const noexcept { return std::to_address( base_ ); }
+        constexpr reference operator[]( std::integral auto const i ) const noexcept { return base_[ i ]; }
 
-        basic_const_iterator & operator++(   ) noexcept { Iter::operator++(); return *this; }
-        basic_const_iterator   operator++(int) noexcept { auto current{ *this }; Iter::operator++(0); return current; }
-        basic_const_iterator & operator--(   ) noexcept { Iter::operator--(); return *this; }
-        basic_const_iterator   operator--(int) noexcept { auto current{ *this }; Iter::operator--(0); return current; }
+        constexpr basic_const_iterator & operator++(   ) noexcept { ++base_; return *this; }
+        constexpr basic_const_iterator   operator++(int) noexcept { return { base_++ }; }
+        constexpr basic_const_iterator & operator--(   ) noexcept { --base_; return *this; }
+        constexpr basic_const_iterator   operator--(int) noexcept { return { --base_ }; }
 
-        basic_const_iterator & operator+=( difference_type const x ) noexcept { static_cast<Iter &>( *this ) += x; return *this; }
-        basic_const_iterator & operator-=( difference_type const x ) noexcept { static_cast<Iter &>( *this ) -= x; return *this; }
+        constexpr basic_const_iterator & operator+=( difference_type const x ) noexcept { base_ += x; return *this; }
+        constexpr basic_const_iterator & operator-=( difference_type const x ) noexcept { base_ -= x; return *this; }
 
-        basic_const_iterator   operator+ ( difference_type const x ) const noexcept { auto res{ *this }; res += x; return res; }
-        basic_const_iterator   operator- ( difference_type const x ) const noexcept { auto res{ *this }; res -= x; return res; }
+        constexpr basic_const_iterator   operator+ ( difference_type const x ) const noexcept { return { base_ + x }; }
+        constexpr basic_const_iterator   operator- ( difference_type const x ) const noexcept { return { base_ - x }; }
 
-        difference_type operator-( basic_const_iterator const & other ) const noexcept
+        constexpr difference_type operator-( basic_const_iterator const & other ) const noexcept
         requires requires{ this->base() - other.base(); }
         {
             return this->base() - other.base();
@@ -42,18 +45,22 @@ namespace std
 
         friend auto operator+( difference_type const diff, basic_const_iterator const & it ) noexcept { return it + diff; }
 
-        reference operator[]( std::integral auto const x ) const noexcept { return Iter::operator[]( x ); }
+        constexpr bool operator== ( Iter                 const & other ) const noexcept { return this->base_ == other; }
+        constexpr bool operator== ( basic_const_iterator const & other ) const noexcept { return this->base_ == other.base_; }
+        constexpr bool operator!= ( basic_const_iterator const & other ) const noexcept { return this->base_ != other.base_; }
+        constexpr bool operator<= ( basic_const_iterator const & other ) const noexcept { return this->base_ <= other.base_; }
+        constexpr bool operator>= ( basic_const_iterator const & other ) const noexcept { return this->base_ >= other.base_; }
+        constexpr bool operator<  ( basic_const_iterator const & other ) const noexcept { return this->base_ <  other.base_; }
+        constexpr bool operator>  ( basic_const_iterator const & other ) const noexcept { return this->base_ >  other.base_; }
 
-        bool operator== ( Iter                 const & other ) const noexcept { return static_cast<Iter const &>( *this ) == other; }
-        bool operator== ( basic_const_iterator const & other ) const noexcept { return *this == static_cast<Iter const &>( other ); }
-        auto operator<=>( basic_const_iterator const & other ) const noexcept
-        requires requires( Iter a, Iter b ){ a <=> b; }
-        {
-            return static_cast<Iter const &>( *this ) <=> static_cast<Iter const &>( other );
-        }
+        constexpr Iter const & base() const &  noexcept { return base_; }
+        constexpr Iter         base()       && noexcept { return std::move( base_ ); }
 
-        constexpr Iter const & base() const &  noexcept { return *this; }
-        constexpr Iter         base()       && noexcept { return std::move( static_cast<Iter &>( *this ) ); }
+    private:
+        Iter base_;
     }; // basic_const_iterator
+
+    template <class Iter> [[ nodiscard ]] constexpr auto *   to_address( basic_const_iterator<Iter> const & const_iter ) noexcept { return   to_address( const_iter.base() ); }
+    template <class Iter> [[ nodiscard ]] constexpr auto * __to_address( basic_const_iterator<Iter> const & const_iter ) noexcept { return __to_address( const_iter.base() ); }
 } // namespace std
 #endif
