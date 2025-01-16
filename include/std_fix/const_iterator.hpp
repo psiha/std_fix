@@ -19,6 +19,10 @@ namespace std
         using reference         = value_type &;
         using pointer           = value_type *;
 
+        // Clang 19.1.6 requires to see base() before it is used in a requires clause
+        constexpr Iter const & base() const &  noexcept { return base_; }
+        constexpr Iter         base()       && noexcept { return std::move( base_ ); }
+
         constexpr basic_const_iterator() noexcept = default;
         constexpr basic_const_iterator( Iter const base ) noexcept : base_( base ) {}
 
@@ -52,9 +56,6 @@ namespace std
         constexpr bool operator>= ( basic_const_iterator const & other ) const noexcept { return this->base_ >= other.base_; }
         constexpr bool operator<  ( basic_const_iterator const & other ) const noexcept { return this->base_ <  other.base_; }
         constexpr bool operator>  ( basic_const_iterator const & other ) const noexcept { return this->base_ >  other.base_; }
-
-        constexpr Iter const & base() const &  noexcept { return base_; }
-        constexpr Iter         base()       && noexcept { return std::move( base_ ); }
 
     private:
         Iter base_;
