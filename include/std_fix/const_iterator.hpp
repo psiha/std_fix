@@ -13,7 +13,7 @@ namespace std
     {
     public:
         using iterator_concept  = Iter::iterator_concept;
-        using iterator_category = Iter::iterator_concept;
+        using iterator_category = std::iterator_traits<Iter>::iterator_category;
         using value_type        = Iter::value_type const;
         using difference_type   = Iter::difference_type;
         using reference         = value_type &;
@@ -33,7 +33,7 @@ namespace std
         constexpr basic_const_iterator & operator++(   ) noexcept { ++base_; return *this; }
         constexpr basic_const_iterator   operator++(int) noexcept { return { base_++ }; }
         constexpr basic_const_iterator & operator--(   ) noexcept { --base_; return *this; }
-        constexpr basic_const_iterator   operator--(int) noexcept { return { --base_ }; }
+        constexpr basic_const_iterator   operator--(int) noexcept { return { base_-- }; }
 
         constexpr basic_const_iterator & operator+=( difference_type const x ) noexcept { base_ += x; return *this; }
         constexpr basic_const_iterator & operator-=( difference_type const x ) noexcept { base_ -= x; return *this; }
